@@ -1,4 +1,6 @@
 # LicenseTemp
+![](https://travis-ci.com/xiashuangxi/licensetemp.svg?branch=master)
+
 给源文件添加 License 信息（待完善）
 
 # 使用方式
