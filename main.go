@@ -22,6 +22,9 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
+
+	"github.com/mingrammer/cfmt"
 )
 
 const (
@@ -103,7 +106,6 @@ func license_exit_sp(data []byte) int {
 		if len(strings.TrimSpace(s)) == 0 {
 			break
 		}
-
 	}
 	return offset
 }
@@ -141,10 +143,17 @@ func execute(ext string, source_directory string, template string) (count int, e
 				log.Fatal(err)
 			}
 
+			fmt.Fprintf(os.Stdout, "%s \t执行\r", fp)
+
 			sp := []byte{'\n', '\n'}
 			sp_offset := license_exit_sp(source_data)
 			// println(sp_offset)
-			new_d := source_data[sp_offset:len(source_data)]
+			var new_d []byte
+			if len(source_data) == 0 {
+				new_d = make([]byte, 0)
+			} else {
+				new_d = source_data[sp_offset:len(source_data)]
+			}
 			source := make([]byte, len(license)+len(new_d)+len(sp))
 
 			copy(source, license)
@@ -152,6 +161,9 @@ func execute(ext string, source_directory string, template string) (count int, e
 			copy(source[len(license)+len(sp):], new_d)
 			ioutil.WriteFile(fp, source, os.ModePerm)
 			result_exec_count += 1
+			time.Sleep(time.Microsecond * 30)
+			fmt.Fprintf(os.Stdout, "%s \t", fp)
+			cfmt.Success("完成\r\n")
 		}
 
 	}
@@ -165,7 +177,17 @@ func init() {
 }
 
 func main() {
+
+	cfmt.Success("LicenseTemp:", "v"+APP_VERSION)
+	fmt.Println(`
+ _    _                    _____               
+| |  (_)__ ___ _ _  ___ __|_   _|__ _ __  _ __ 
+| |__| / _/ -_) ' \(_-</ -_)| |/ -_) '  \| '_ \
+|____|_\__\___|_||_/__/\___||_|\___|_|_|_| .__/
+                                    	 |_|    
+	`)
+
 	flag.Parse()
 	count, _ := execute(ext, source_directory, template)
-	fmt.Println("完成：【", count, "】个文件的 License 的插入")
+	fmt.Printf("执行完成，实现对 %d 个文件的 License 信息的插入。", count)
 }
